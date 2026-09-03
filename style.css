@@ -7,10 +7,10 @@
    so it stays meaningful rather than decorative.
    ========================================================= */
 :root {
-  --bg: #0F1222;
-  --bg-elevated: #151933;
-  --surface: #1B2040;
-  --surface-2: #232A52;
+  --bg: #EDEEF7;
+  --bg-elevated: #EDEEF7;
+  --surface: #FF6B7A;
+  --surface-2: #FF6B7A;
   --border: rgba(255, 255, 255, 0.08);
   --text: #EDEEF7;
   --text-dim: #9297B5;
@@ -786,8 +786,31 @@ body {
 .image-preview-tile { min-width:0; border:1px solid var(--border, #e8d9d0); border-radius:12px; overflow:hidden; background:#fffaf7; }
 .image-preview-tile img { width:100%; aspect-ratio:1; object-fit:cover; display:block; }
 .image-preview-tile span { display:block; padding:5px 6px; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.image-gallery { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-.image-gallery img { width:100%; border-radius:14px; display:block; object-fit:cover; max-height:420px; }
+.image-gallery {
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  padding:2px 2px 10px;
+  margin-bottom:4px;
+  scrollbar-width:thin;
+}
+.image-gallery::-webkit-scrollbar { height:5px; }
+.image-gallery img {
+  flex:0 0 100%;
+  width:100%;
+  max-width:100%;
+  height:auto;
+  max-height:58vh;
+  border-radius:14px;
+  display:block;
+  object-fit:contain;
+  background:var(--bg);
+  scroll-snap-align:start;
+}
 .item-thumb-wrap { position:relative; flex:0 0 auto; }
 .image-count-badge { position:absolute; right:5px; bottom:5px; background:rgba(80,45,30,.82); color:#fff; border-radius:999px; padding:3px 7px; font-size:11px; font-weight:700; }
-@media (max-width:520px) { .image-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .image-gallery { grid-template-columns:1fr; } }
+@media (max-width:520px) { .image-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
