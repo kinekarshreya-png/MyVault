@@ -3,7 +3,7 @@
 
   Caches the app shell (HTML/CSS/JS/icons) so MyVault opens and works
   offline. Your actual vault data never touches this cache — that lives
-  in IndexedDB (see js/db.js), which works offline on its own regardless
+  in IndexedDB (see db.js), which works offline on its own regardless
   of the service worker.
 */
 
@@ -12,19 +12,19 @@ const SHELL_FILES = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/style.css",
-  "./js/utils.js",
-  "./js/db.js",
-  "./js/auth.js",
+  "./style.css",
+  "./utils.js",
+  "./db.js",
+  "./auth.js",
   "./js/search.js",
-  "./js/ai.js",
-  "./js/backup.js",
-  "./js/ui.js",
-  "./js/app.js",
-  "./assets/icons/icon-192.png",
-  "./assets/icons/icon-512.png",
-  "./assets/icons/apple-touch-icon.png",
-  "./assets/icons/favicon-32.png",
+  "./ai.js",
+  "./backup.js",
+  "./ui.js",
+  "./app.js",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./apple-touch-icon.png",
+  "./favicon-32.png",
 ];
 
 self.addEventListener("install", (event) => {
