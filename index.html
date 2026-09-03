@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>MyVault — Your memory, when your brain needs backup</title>
+<meta name="description" content="A private, offline-first personal vault for notes, files, tasks, reminders and projects." />
+<meta name="theme-color" content="#0F1222" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="favicon-32.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ LOCK / GATE SCREEN ============ -->
+<div id="gate-screen" class="gate-screen hidden">
+  <div class="gate-card">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><polygon points="50,8 85,29 85,71 50,92 15,71 15,29" fill="none" stroke="var(--teal)" stroke-width="4"/><circle cx="50" cy="50" r="9" fill="var(--text)"/><circle cx="50" cy="8" r="5" fill="var(--teal)"/><circle cx="85" cy="29" r="5" fill="var(--coral)"/><circle cx="85" cy="71" r="5" fill="var(--teal)"/></svg>
+    </div>
+    <h1 class="gate-title">MyVault</h1>
+    <p class="gate-sub" id="gate-sub">Enter your PIN to continue</p>
+
+    <div id="gate-pin-dots" class="pin-dots">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div id="gate-error" class="gate-error"></div>
+
+    <div class="keypad" id="gate-keypad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button class="ghost" id="gate-biometric-btn" aria-label="Use biometrics">🔒</button>
+      <button data-k="0">0</button>
+      <button class="ghost" id="gate-back">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ONBOARDING SCREEN ============ -->
+<div id="onboard-screen" class="onboard-screen hidden">
+  <div class="onboard-card">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><polygon points="50,8 85,29 85,71 50,92 15,71 15,29" fill="none" stroke="var(--teal)" stroke-width="4"/><circle cx="50" cy="50" r="9" fill="var(--text)"/><circle cx="50" cy="8" r="5" fill="var(--teal)"/><circle cx="85" cy="29" r="5" fill="var(--coral)"/><circle cx="85" cy="71" r="5" fill="var(--teal)"/></svg>
+    </div>
+    <h1 class="onboard-title">MyVault</h1>
+    <p class="onboard-tagline">Your memory, when your brain needs backup.</p>
+
+    <div class="onboard-actions">
+      <button id="onboard-google-btn" class="btn btn-outline btn-block">Continue with Google</button>
+      <button id="onboard-local-btn" class="btn btn-primary btn-block">Continue without Google</button>
+    </div>
+    <p class="onboard-note" id="onboard-google-note">Google sign-in isn't set up yet — you can still use MyVault fully, locally on this device. See Settings → Account later to add it.</p>
+  </div>
+</div>
+
+<!-- ============ APP ROOT ============ -->
+<div id="app-root" class="app-root hidden">
+
+  <!-- ---------- HEADER ---------- -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="header-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><polygon points="50,8 85,29 85,71 50,92 15,71 15,29" fill="none" stroke="var(--teal)" stroke-width="6"/><circle cx="50" cy="50" r="10" fill="var(--text)"/></svg>
+      </span>
+      <div>
+        <div class="header-title">MyVault</div>
+        <div class="header-tagline" id="header-tagline">Your memory, when your brain needs backup.</div>
+      </div>
+    </div>
+    <button class="icon-btn" id="assistant-btn" aria-label="Open MyVault Assistant" title="MyVault Assistant">✨</button>
+  </header>
+
+  <main class="app-main" id="app-main">
+
+    <!-- ---------- HOME VIEW ---------- -->
+    <section class="view" id="view-home" data-view="home">
+      <div class="search-launcher" id="search-launcher">
+        <span class="search-icon">🔍</span>
+        <span class="search-placeholder">Search your whole Vault…</span>
+      </div>
+
+      <div id="home-sections"></div>
+    </section>
+
+    <!-- ---------- SEARCH VIEW ---------- -->
+    <section class="view" id="view-search" data-view="search">
+      <div class="search-bar-row">
+        <button class="icon-btn" id="search-back">←</button>
+        <input type="search" id="search-input" placeholder="Search notes, files, tags, links…" autocomplete="off" />
+      </div>
+      <div class="chip-row" id="search-filters"></div>
+      <div class="sort-row">
+        <select id="search-sort">
+          <option value="recent-added">Recently added</option>
+          <option value="recent-modified">Recently modified</option>
+          <option value="oldest">Oldest</option>
+          <option value="az">A–Z</option>
+        </select>
+        <span class="result-count" id="search-count"></span>
+      </div>
+      <div id="search-results" class="item-list"></div>
+    </section>
+
+    <!-- ---------- TASKS VIEW ---------- -->
+    <section class="view" id="view-tasks" data-view="tasks">
+      <div class="view-header-row">
+        <h2>Tasks</h2>
+      </div>
+      <div class="tab-row" id="tasks-tab-row">
+        <button class="tab active" data-tasktab="today">Today</button>
+        <button class="tab" data-tasktab="upcoming">Upcoming</button>
+        <button class="tab" data-tasktab="done">Completed</button>
+      </div>
+      <div id="tasks-list" class="item-list"></div>
+    </section>
+
+    <!-- ---------- MORE VIEW ---------- -->
+    <section class="view" id="view-more" data-view="more">
+      <h2 class="view-title">More</h2>
+      <div class="more-grid" id="more-grid">
+        <button class="more-tile" data-more="categories"><span>🗂️</span>Categories</button>
+        <button class="more-tile" data-more="myapps"><span>🚀</span>My Apps</button>
+        <button class="more-tile" data-more="important"><span>💠</span>Important</button>
+        <button class="more-tile" data-more="reminders"><span>🔔</span>Reminders</button>
+        <button class="more-tile" data-more="trash"><span>🗑️</span>Trash</button>
+        <button class="more-tile" data-more="backup"><span>💾</span>Backup</button>
+        <button class="more-tile" data-more="settings"><span>⚙️</span>Settings</button>
+        <button class="more-tile" data-more="account"><span>👤</span>Account</button>
+      </div>
+    </section>
+
+    <!-- ---------- SUB VIEW: generic list (categories list, category detail, favorites, important, reminders, trash) ---------- -->
+    <section class="view" id="view-sublist" data-view="sublist">
+      <div class="view-header-row">
+        <button class="icon-btn" id="sublist-back">←</button>
+        <h2 id="sublist-title">Title</h2>
+      </div>
+      <div id="sublist-toolbar" class="sublist-toolbar"></div>
+      <div id="sublist-content" class="item-list"></div>
+    </section>
+
+    <!-- ---------- MY APPS ---------- -->
+    <section class="view" id="view-myapps" data-view="myapps">
+      <div class="view-header-row">
+        <button class="icon-btn" id="myapps-back">←</button>
+        <h2>My Apps</h2>
+        <button class="icon-btn" id="myapps-add">＋</button>
+      </div>
+      <div id="myapps-list" class="myapp-grid"></div>
+    </section>
+
+    <!-- ---------- MY APP DETAIL ---------- -->
+    <section class="view" id="view-myapp-detail" data-view="myapp-detail">
+      <div class="view-header-row">
+        <button class="icon-btn" id="myapp-detail-back">←</button>
+        <h2 id="myapp-detail-title">App</h2>
+        <button class="icon-btn" id="myapp-detail-edit">✏️</button>
+      </div>
+      <div id="myapp-detail-content"></div>
+    </section>
+
+    <!-- ---------- SETTINGS ---------- -->
+    <section class="view" id="view-settings" data-view="settings">
+      <div class="view-header-row">
+        <button class="icon-btn" id="settings-back">←</button>
+        <h2>Settings</h2>
+      </div>
+      <div id="settings-content" class="settings-list"></div>
+    </section>
+
+    <!-- ---------- ACCOUNT ---------- -->
+    <section class="view" id="view-account" data-view="account">
+      <div class="view-header-row">
+        <button class="icon-btn" id="account-back">←</button>
+        <h2>Account</h2>
+      </div>
+      <div id="account-content" class="settings-list"></div>
+    </section>
+
+    <!-- ---------- BACKUP ---------- -->
+    <section class="view" id="view-backup" data-view="backup">
+      <div class="view-header-row">
+        <button class="icon-btn" id="backup-back">←</button>
+        <h2>Backup &amp; Restore</h2>
+      </div>
+      <div id="backup-content" class="settings-list"></div>
+    </section>
+
+    <!-- ---------- ASSISTANT ---------- -->
+    <section class="view" id="view-assistant" data-view="assistant">
+      <div class="view-header-row">
+        <button class="icon-btn" id="assistant-back">←</button>
+        <h2>MyVault Assistant</h2>
+      </div>
+      <div id="assistant-thread" class="assistant-thread"></div>
+      <form id="assistant-form" class="assistant-input-row">
+        <input id="assistant-input" type="text" placeholder="Ask about your Vault… e.g. “I'm feeling demotivated”" autocomplete="off" />
+        <button type="submit" class="icon-btn primary">➤</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- ---------- ITEM DETAIL MODAL ---------- -->
+  <div class="modal-overlay hidden" id="item-detail-overlay">
+    <div class="modal-sheet">
+      <div class="modal-sheet-handle"></div>
+      <div id="item-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ---------- BOTTOM NAV ---------- -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-nav="home"><span>🏠</span>Home</button>
+    <button class="nav-btn" data-nav="search"><span>🔍</span>Search</button>
+    <button class="nav-btn" data-nav="tasks"><span>✅</span>Tasks</button>
+    <button class="nav-btn" data-nav="more"><span>⋯</span>More</button>
+  </nav>
+</div>
+
+<!-- ============ ADD SHEET ============ -->
+<div class="modal-overlay hidden" id="add-sheet-overlay">
+  <div class="modal-sheet">
+    <div class="modal-sheet-handle"></div>
+    <h3 class="sheet-title">Add to your Vault</h3>
+    <div class="add-type-grid" id="add-type-grid">
+      <button class="add-type" data-type="note"><span>📝</span>Note</button>
+      <button class="add-type" data-type="task"><span>✅</span>Task</button>
+      <button class="add-type" data-type="link"><span>🔗</span>Link</button>
+      <button class="add-type" data-type="image"><span>🖼️</span>Image</button>
+      <button class="add-type" data-type="file"><span>📎</span>File</button>
+      <button class="add-type" data-type="video"><span>🎬</span>Video</button>
+      <button class="add-type" data-type="document"><span>📄</span>Document</button>
+      <button class="add-type" data-type="quick"><span>⚡</span>Quick Capture</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ITEM FORM SHEET (create/edit) ============ -->
+<div class="modal-overlay hidden" id="form-sheet-overlay">
+  <div class="modal-sheet modal-sheet-tall">
+    <div class="modal-sheet-handle"></div>
+    <div class="sheet-header-row">
+      <h3 class="sheet-title" id="form-sheet-title">New Note</h3>
+      <button class="icon-btn" id="form-sheet-close">✕</button>
+    </div>
+    <form id="item-form"></form>
+  </div>
+</div>
+
+<!-- ============ CATEGORY FORM SHEET ============ -->
+<div class="modal-overlay hidden" id="category-sheet-overlay">
+  <div class="modal-sheet">
+    <div class="modal-sheet-handle"></div>
+    <h3 class="sheet-title">New Category</h3>
+    <form id="category-form">
+      <label class="field-label">Name</label>
+      <input class="field-input" id="cat-name" placeholder="e.g. JavaScript" required maxlength="40" />
+      <label class="field-label">Color</label>
+      <div class="color-swatch-row" id="cat-color-row"></div>
+      <button type="submit" class="btn btn-primary btn-block">Create Category</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ CONFIRM DIALOG ============ -->
+<div class="modal-overlay hidden" id="confirm-overlay">
+  <div class="confirm-card">
+    <p id="confirm-message">Are you sure?</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="utils.js"></script>
+<script src="db.js"></script>
+<script src="auth.js"></script>
+<script src="search.js"></script>
+<script src="ai.js"></script>
+<script src="backup.js"></script>
+<script src="ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
