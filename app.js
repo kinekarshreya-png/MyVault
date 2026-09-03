@@ -818,6 +818,11 @@
   }
 
   function openItemForm(type, existingItem) {
+    // A form is its own sheet. Close any sheet that may still be underneath it
+    // so we never stack the item-detail/add sheets visually.
+    closeSheet("add-sheet-overlay");
+    closeSheet("item-detail-overlay");
+
     state.pendingFormType = type;
     state.editingItem = existingItem || null;
     state.formFileBlob = existingItem && existingItem.fileBlob instanceof Blob ? existingItem.fileBlob : null;
